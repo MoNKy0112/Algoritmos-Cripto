@@ -4,71 +4,13 @@ from tkinter import Frame, filedialog, simpledialog, messagebox
 from alfabeto import cargar_alfabeto, cambiar_alfabeto
 from cifrado_cesar import cifrar, descifrar
 
-# Crear una ventana oculta
-# root = tk.Tk()
-# root.withdraw()  # Oculta la ventana principal
-alphabet = cargar_alfabeto()
-if alphabet is None:
-    alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
-                'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 
-
-# def cambiar_alfabeto():
-#     new_alphabet = []
-#     # Abrir el cuadro de diálogo para seleccionar un archivo
-#     file_path = filedialog.askopenfilename(
-#         title="Selecciona un archivo de texto",
-#         filetypes=[("Archivos de texto", "*.txt")]
-#     )
-
-#     # Verificar si se seleccionó un archivo
-#     if file_path:
-#         try:
-#             # Abrir el archivo y leer línea por línea
-#             with open(file_path, 'r', encoding='utf-8') as file:
-#                 for line in file:
-#                     # print(line.strip())  # Imprimir la línea sin saltos de línea extra
-#                     new_alphabet.append(line.strip())
-#             alphabet = new_alphabet
-#             return new_alphabet
-#         except Exception as e:
-#             print(f"Error al leer el archivo: {e}")
-#     else:
-#         print("No se seleccionó ningún archivo.")
-
-
-def procesar_opcion(opcion):
-    top = tk.Toplevel()
-    top.geometry("300x300+500+500")
-    listbox = tk.Listbox(top)
-    listbox.insert(1, "Cifrado Cesar")
-    listbox.insert(2, "Cifrado ...")
-    listbox.pack()
-    if opcion == "cifrar":
-
-        top.title("Cifrar")
-
-        # Crear una nueva ventana para ingresar datos necesarios segun cifrado
-        texto = simpledialog.askstring(
-            "Cifrar", "Por favor, ingrese el texto a cifrar:")
-        llave = simpledialog.askinteger(
-            "Cifrar", "Por favor, ingrese la llave:")
-        cifrado = cifrar(texto, llave, alphabet)
-        print(cifrado)
-        tk.Message(top, text=cifrado).pack()
-        tk.Button(top, text="Copiar al portapapeles",
-                  command=lambda: root.clipboard_append(cifrado)).pack()
-    if opcion == "descifrar":
-        # Crear una nueva ventana para ingresar datos necesarios segun cifrado
-        texto = simpledialog.askstring(
-            "Descifrar", "Por favor, ingrese el texto a descifrar:")
-        llave = simpledialog.askinteger(
-            "Descifrar", "Por favor, ingrese la llave:")
-        descifrado = descifrar(texto, llave, alphabet)
-        print(descifrado)
-        tk.Message(top, text=descifrado).pack()
-        tk.Button(top, text="Copiar al portapapeles",
-                  command=lambda: root.clipboard_append(descifrado)).pack()
+def config():
+    global alphabet
+    alphabet = cargar_alfabeto()
+    if alphabet is None:
+        alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
+                    'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 
 
 class cifradoUI(Frame):
@@ -78,28 +20,72 @@ class cifradoUI(Frame):
         self.initUI()
 
     def initUI(self):
+        global resultLabel
+
+        def only_numbers(char):
+            return char.isdigit()
+        validation = root.register(only_numbers)
+
         self.master.title("Cifrado")
         self.pack(fill=tk.BOTH, expand=1)
-        self.centerWindow()
+
+        lbl = tk.Label(self, text="Cifrado")
+        lbl.grid(row=0, column=0, sticky=tk.W, pady=4, padx=5)
+
+        text = tk.Text(self, height=20, width=50)
+        text.grid(row=1, column=0, columnspan=2, rowspan=4,
+                  pady=4, padx=5, sticky=tk.W+tk.E+tk.N+tk.S)
+
+        key = tk.Spinbox(self, from_=0, increment=1,
+                         textvariable=tk.IntVar(value=3), validate="key", validatecommand=(validation, '%S'))
+        key.grid(row=1, column=2, pady=4, padx=5)
+
+        resultLabel = tk.Label(self, text="Resultado = ")
+        resultLabel.grid(row=5, column=0, columnspan=2,
+                         pady=4, padx=5, sticky=tk.W)
+
+        btn_cifrar = tk.Button(self, text="Cifrar",
+                               command=lambda: self.cifrar_ui(text.get("1.0", "end-1c"), int(key.get())))
+        btn_cifrar.grid(row=6, column=0, pady=4, padx=5, sticky=tk.W+tk.E)
+
+        btn_descifrar = tk.Button(
+            self, text="Descifrar", command=lambda: self.descifrar_ui(str(text.get("1.0", "end-1c")), int(key.get())))
+        btn_descifrar.grid(row=6, column=1, pady=4, padx=5, sticky=tk.W+tk.E)
+
+        btn_cambiar_alfabeto = tk.Button(
+            self, text="Cambiar alfabeto", command=lambda: self.cambiar_alfabeto())
+        btn_cambiar_alfabeto.grid(
+            row=6, column=2, pady=4, padx=5, sticky=tk.W+tk.E)
+        chk_space = tk.Checkbutton(
+            self, text="Incluir espacios", variable=tk.BooleanVar())
+        chk_space.grid(row=7, column=0, pady=4, padx=5, sticky=tk.W+tk.E)
+
+    def on_closing(self):
+        if messagebox.askokcancel("Salir", "¿Estás seguro que deseas salir?"):
+            self.master.destroy()
+
+    def cambiar_alfabeto(self):
+        global alphabet
+        alphabet = cambiar_alfabeto()
+
+    def cifrar_ui(self, texto, llave):
+        global resultLabel
+
+        result = cifrar(texto, llave, alphabet)
+        print(result)
+        resultLabel.config(text="Resultado = " + result)
+
+    def descifrar_ui(self, texto, llave):
+        global resultLabel
+
+        result = descifrar(texto, llave, alphabet)
+        resultLabel.config(text="Resultado = " + result)
 
 
 def main_menu():
-    global root
+    global root, alphabet
+    config()
     root = tk.Tk()
-    root.geometry("500x500+500+500")
-    root.title("Criptografia")
-
-    tk.Menu(root)
-
-    tk.Label(root, text="Bienvenido a la aplicación de criptografía").pack()
-
-    tk.Button(root, text="Cifrar",
-              command=lambda: procesar_opcion("cifrar")).pack()
-
-    tk.Button(root, text="Descifrar",
-              command=lambda: procesar_opcion("descifrar")).pack()
-
-    tk.Button(root, text="Cambiar alfabeto",
-              command=lambda: cambiar_alfabeto).pack()
-
+    root.geometry("600x600+500+300")
+    app = cifradoUI()
     root.mainloop()
