@@ -4,7 +4,7 @@ from cifrado_cesar import cifrar, descifrar
 
 
 def config():
-    global alphabet
+    global alphabet, cifrado_actual
     alphabet = cargar_alfabeto()
     if alphabet is None:
         alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
@@ -12,7 +12,7 @@ def config():
 
 
 def console_menu():
-    global alphabet
+    global alphabet, cifrado_actual
     config()
     print("Bienvenido a la aplicación de criptografía")
 
@@ -21,7 +21,9 @@ def console_menu():
         print("1. Cifrar texto")
         print("2. Descifrar texto")
         print("3. Cambiar alfabeto")
-        print("4. Salir")
+        print("4. Mostrar alfabeto")
+        print(f"5. Cambiar tipo de cifrado (Actual: ${cifrado_actual})")
+        print("6. Salir")
 
     opcion = None
     while opcion != 4:
@@ -43,6 +45,10 @@ def console_menu():
         elif opcion == "3":
             alphabet = cambiar_alfabeto()
         elif opcion == "4":
+            print(alphabet)
+        elif opcion == "5":
+            break
+        elif opcion == "6":
             print("Gracias por usar la aplicación.")
             break
         elif opcion == "5":
