@@ -1,14 +1,23 @@
-import cifrado
 alfabeto = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L",
             "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
 
 
-class cifrado_playfair(cifrado):
+class CifradoPlayfair:
+    nombre = "Cifrado Playfair"
 
-    def __init__(self, alfabeto, clave):
+    def __init__(self, alfabeto, console_mode=False):
         self.alfabeto = alfabeto
-        self.matriz = [[0 for i in range(5)] for j in range(5)]
+        console_mode if self.console_config() else self.ui_config
+        pass
+
+    def console_config(self):
+        self.size = int(input("Ingrese el tamaño de la matriz: "))
+        clave = input("Ingrese la clave: ")
+        self.matriz = [[0 for i in range(self.size)] for j in range(self.size)]
         self.crear_matriz(clave)
+        pass
+
+    def ui_config(self):
         pass
 
     def crear_matriz(self, clave):
@@ -26,7 +35,7 @@ class cifrado_playfair(cifrado):
                 self.dict[letra] = {"fila": fila, "col": col}
             else:
                 continue
-            if (col == 4):
+            if (col == self.size-1):
                 col = 0
                 fila += 1
             else:
@@ -42,13 +51,13 @@ class cifrado_playfair(cifrado):
                 self.dict[letra] = {"fila": fila, "col": col}
             else:
                 continue
-            if (col == 4):
+            if (col == self.size-1):
                 col = 0
                 fila += 1
             else:
                 col += 1
 
-    def encriptar(self, texto: str):
+    def cifrar(self, texto: str):
         texto = texto.upper().replace(" ", "")
         texto_cifrado = ""
         while len(texto) > 0:
@@ -68,11 +77,11 @@ class cifrado_playfair(cifrado):
             col2 = self.dict[par[1]]["col"]
             # Caso1 misma fila
             if fila1 == fila2:
-                new_char1 = self.matriz[fila1][(col1 + 1) % 5]
-                new_char2 = self.matriz[fila2][(col2 + 1) % 5]
+                new_char1 = self.matriz[fila1][(col1 + 1) % self.size]
+                new_char2 = self.matriz[fila2][(col2 + 1) % self.size]
             elif col1 == col2:
-                new_char1 = self.matriz[(fila1 + 1) % 5][col1]
-                new_char2 = self.matriz[(fila2 + 1) % 5][col2]
+                new_char1 = self.matriz[(fila1 + 1) % self.size][col1]
+                new_char2 = self.matriz[(fila2 + 1) % self.size][col2]
             else:
                 new_char1 = self.matriz[fila1][col2]
                 new_char2 = self.matriz[fila2][col1]
@@ -80,7 +89,7 @@ class cifrado_playfair(cifrado):
             # print(par, " -> ", new_char1, new_char2)
         return texto_cifrado
 
-    def desencriptar(self, texto: str):
+    def descifrar(self, texto: str):
         texto = texto.upper().replace(" ", "")
         texto_descifrado = ""
         while len(texto) > 0:
@@ -100,11 +109,11 @@ class cifrado_playfair(cifrado):
             col2 = self.dict[par[1]]["col"]
             # Caso1 misma fila
             if fila1 == fila2:
-                new_char1 = self.matriz[fila1][(col1 - 1) % 5]
-                new_char2 = self.matriz[fila2][(col2 - 1) % 5]
+                new_char1 = self.matriz[fila1][(col1 - 1) % self.size]
+                new_char2 = self.matriz[fila2][(col2 - 1) % self.size]
             elif col1 == col2:
-                new_char1 = self.matriz[(fila1 - 1) % 5][col1]
-                new_char2 = self.matriz[(fila2 - 1) % 5][col2]
+                new_char1 = self.matriz[(fila1 - 1) % self.size][col1]
+                new_char2 = self.matriz[(fila2 - 1) % self.size][col2]
             else:
                 new_char1 = self.matriz[fila1][col2]
                 new_char2 = self.matriz[fila2][col1]
@@ -117,12 +126,12 @@ class cifrado_playfair(cifrado):
             print(fila)
 
 
-playfair = cifrado_playfair(alfabeto, "JorgeYMaria")
+# playfair = cifrado_playfair(alfabeto, "JorgeYMaria")
 
-playfair.print_matriz()
+# playfair.print_matriz()
 
-print("TExto a encriptarr")
-texto_cif = playfair.encriptar("TExto a encriptarr")
-print(texto_cif)
-texto_cif = playfair.desencriptar(texto_cif)
-print(texto_cif)
+# print("TExto a encriptarr")
+# texto_cif = playfair.cifrar("TExto a encriptarr")
+# print(texto_cif)
+# texto_cif = playfair.descifrar(texto_cif)
+# print(texto_cif)

@@ -2,8 +2,11 @@ from abc import ABC, abstractmethod
 
 
 class cifrado(ABC):
-    def __init__(self, alfabeto):
+    self.nombre = ""
+
+    def __init__(self, alfabeto, nombre):
         self.alfabeto = alfabeto
+        self.nombre = nombre
 
     def config(self, **kwargs):
         pass

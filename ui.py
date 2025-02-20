@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import Frame, filedialog, simpledialog, messagebox
 
 from alfabeto import cargar_alfabeto, cambiar_alfabeto
-from cifrado_cesar import cifrar, descifrar
+import cifrado_cesar
 
 
 def config():
