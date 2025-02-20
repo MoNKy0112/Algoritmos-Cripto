@@ -16,6 +16,7 @@ class CifradoCesar:
         pass
 
     def cifrar(self, texto_plano):
+        texto_plano = texto_plano.replace(" ", "")
         final_word = ""
         for letter in texto_plano:
             try:

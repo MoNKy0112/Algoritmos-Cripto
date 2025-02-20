@@ -6,10 +6,11 @@ class CifradoMonoalfabetico:
     nombre = "Cifrado Monoalfabetico"
 
     def __init__(self, alfabeto: list[str], console_mode=False):
+        print(console_mode)
         self.alfabeto = alfabeto
         self.dict = {}
-        self.crear_dict()
         console_mode if self.console_config() else self.ui_config()
+        self.crear_dict()
         pass
 
     def console_config(self):
@@ -44,9 +45,11 @@ class CifradoMonoalfabetico:
 
 # # Prueba
 # alfabeto = list(string.ascii_uppercase)
+# alfabeto = 'A B C D E F G H I J K L M N Ñ O P Q R S T U V W X Y Z'.split()
+# clave = 'E,T,U,O,A,D,S,N,I,R,L,C,P,M,B,Q,G,H,F,J,K,V,W,X,Y,Z'.split(',')
 # clave = alfabeto[:]
 # random.shuffle(clave)
-# cifrado = cifrado_monoalfabetico(alfabeto, clave)
+# cifrado = CifradoMonoalfabetico(alfabeto, True)
 # texto = "HOLA MUNDO"
 # texto_cifrado = cifrado.cifrar(texto)
 # print(texto_cifrado)

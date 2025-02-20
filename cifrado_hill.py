@@ -21,10 +21,11 @@ class CifradoHill:
     def console_config(self, with_ui: bool = False):
         def define_matrix(in_matriz):
             self.matriz_llave = np.array(eval(in_matriz))
+            # self.matriz_llave = Matrix.T
             print("Matriz ingresada:", self.matriz_llave)
             self.dimension = self.matriz_llave.shape[0]
             print("Dimensión de la matriz:", self.dimension)
-            if np.gcd(Matrix(self.matriz_llave).det(), len(alfabeto)) != 1:
+            if np.gcd(Matrix(self.matriz_llave).det(), len(self.alfabeto)) != 1:
                 raise ValueError(
                     "El determinante de la matriz debe ser coprimo con la longitud del alfabeto.")
             self.inversa_llave = np.array(Matrix(
@@ -63,6 +64,7 @@ class CifradoHill:
                     in_matriz = input("Matriz: ")
                     define_matrix(in_matriz)
                     is_valid = True
+
                 except ValueError as e:
                     print(e)
                     continue
@@ -88,22 +90,35 @@ class CifradoHill:
         return np.array([lista_numeros[i:i+self.dimension] for i in range(0, len(lista_numeros), self.dimension)])
 
     def cifrar(self, texto: str) -> str:
+        mod = len(self.alfabeto)
+        n = self.dimension
+
         texto = self.validar_y_normalizar_texto(texto)
         texto_numeros = self._texto_a_numeros(texto)
-        matriz_a_encriptar = self.matriz_a_encriptar(texto_numeros)
+
+        # matriz_a_encriptar = self.matriz_a_encriptar(texto_numeros)
+        # print("Matriz: ", matriz_a_encriptar)
         texto_cifrado_numeros: list[int] = []
-        for i in range(matriz_a_encriptar.shape[0]):
-            texto_cifrado_numeros.extend(
-                np.dot(self.matriz_llave, matriz_a_encriptar[i]) % len(self.alfabeto))
+        for i in range(0, len(texto_numeros), n):
+            block = np.array(texto_numeros[i:i+n]).reshape(-1, 1)
+            encrypted_block = (self.matriz_llave @ block) % mod
+            texto_cifrado_numeros.extend(encrypted_block.flatten())
+
+        # for i in range(matriz_a_encriptar.shape[0]):
+        #     texto_cifrado_numeros.extend(
+        #         np.dot(self.matriz_llave, matriz_a_encriptar[i]) % len(self.alfabeto))
+        #     print("Multiplicación: ", matriz_a_encriptar[i], np.dot(
+        #         self.matriz_llave, matriz_a_encriptar[i]))
+
         return self._numeros_a_texto(texto_cifrado_numeros)
 
     def validar_y_normalizar_texto(self, texto: str) -> str:
 
         # Se convierte el texto a mayúsculas y se eliminan los espacios
-        texto = texto.upper().replace(' ', '')
+        texto = texto.replace(' ', '')
         # Si el texto no es múltiplo de la dimensión de la matriz, se rellena con 'X'
         if len(texto) % self.dimension != 0:
-            texto += 'X' * (self.dimension - len(texto) % self.dimension)
+            texto += 'x' * (self.dimension - len(texto) % self.dimension)
         return texto
 
     def descifrar(self, texto_cifrado: str) -> str:
